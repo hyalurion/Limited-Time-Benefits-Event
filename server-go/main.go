@@ -68,15 +68,14 @@ func main() {
 	// client request is fast. Failures are logged but do not stop the server.
 	go func() {
 		if _, err := gpcClient.ensureOAuthClient(); err != nil {
-			log.Println("WARN: 初始化 GPC OAuth 客户端失败（页面仍可用，首次授权时会重试）:", err)
+			log.Println("WARN: Failed to initialize GPC OAuth client (page still available, will retry on first authorization):", err)
 		} else {
-			log.Println("GPC OAuth 客户端已就绪")
+			log.Println("GPC OAuth client is ready")
 		}
 	}()
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/activities", handlerConfig.activitiesHandler)
 	mux.HandleFunc("/api/download_apk", handlerConfig.downloadApkHandler)
 	mux.HandleFunc("/api/download_apk/{filename}", handlerConfig.downloadApkFileHandler)
 	mux.HandleFunc("/api/outdate-test/markdown", handlerConfig.listMarkdownHandler)

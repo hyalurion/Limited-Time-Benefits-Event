@@ -1,0 +1,204 @@
+<resources>
+    <string name="app_name">Yorozuya</string>
+    <string name="activity">Event</string>
+    <string name="tab_home">Quiz &amp; Earn</string>
+    <string name="tab_answers">Past Questions</string>
+    <string name="tab_food">What to Eat</string>
+    <string name="tab_settings">Settings</string>
+    <string name="general_settings_title">General</string>
+    <string name="language_settings">Language</string>
+    <string name="language_follow_system">Follow System</string>
+    <string name="language_zh_cn">Simplified Chinese</string>
+    <string name="language_zh_tw">Traditional Chinese</string>
+    <string name="language_en">English</string>
+    <string name="language_ja">Japanese</string>
+    <string name="language_switched">Language switched to %1$s</string>
+    <string name="food_settings_section">What to Eat</string>
+    <string name="food_manage_title">Menu Management</string>
+    <string name="theme_settings">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_auto">Auto</string>
+    <string name="theme_switched">Applied %1$s</string>
+    <string name="loading_text">Loading…</string>
+    <string name="error_title">Oops, the signal got lost</string>
+    <string name="please_select_file">Please select a file</string>
+    <string name="failed_to_get_files">Your request set off full of confidence and came back silent.\n 400 Unable to get file list \n</string>
+    <string name="failed_to_get_content">The data you requested is in a bad mood and refuses to be read.\n 400 Unable to get file content \n</string>
+    <string name="error_getting_files">We waited a long time — long enough to brew a cup of coffee; the coffee went cold, and still no result.\n 404 Failed to get file list \n</string>
+    <string name="error_getting_content">Your request hit traffic on the cyber highway, please wait patiently.\n 404 Failed to get file content \n</string>
+    <string name="date_format">%1$s %2$s</string>
+    <string name="month_1">January</string>
+    <string name="month_2">February</string>
+    <string name="month_3">March</string>
+    <string name="month_4">April</string>
+    <string name="month_5">May</string>
+    <string name="month_6">June</string>
+    <string name="month_7">July</string>
+    <string name="month_8">August</string>
+    <string name="month_9">September</string>
+    <string name="month_10">October</string>
+    <string name="month_11">November</string>
+    <string name="month_12">December</string>
+    <string name="update_dialog_title">Latest Version</string>
+    <string name="update_dialog_button">Update Now (%sMB)</string>
+    <string name="update_dialog_hint">The installer will open automatically once the download finishes</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_available">New version available</string>
+    <string name="update_not_available">You are on the latest version</string>
+    <string name="update_error">Failed to check for updates</string>
+    <string name="update_check_failed">Failed to check for updates</string>
+    <string name="update_start_download">Starting download…</string>
+    <string name="update_download_failed">Download failed</string>
+    <string name="update_need_install_permission">Please allow \"Install unknown apps\" before checking for updates again</string>
+    <string name="update_notification_title">Update App</string>
+    <string name="update_notification_description">Downloading the latest version</string>
+    <string name="version_info">Version Info</string>
+    <string name="update_check_manually">Check for Updates</string>
+    <string name="update_no_new_version">You are on the latest version</string>
+    <string name="update_version_name">Version %s</string>
+    <string name="legal_settings">Legal</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="licenses_title">Open Source Licenses</string>
+    <string name="licenses_subtitle">Third-Party Software</string>
+    <string name="licenses_description">This application uses the following open source software. Tap on any item to view its license details.</string>
+    <string name="licenses_list_title">Licenses</string>
+    <string name="license_version">Version</string>
+    <string name="license_type">License</string>
+    <string name="back">Back</string>
+    <string name="no_browser_found">No browser found</string>
+    <string name="open_link_failed">Failed to open link</string>
+
+    <!-- Quiz / activity screen -->
+    <string name="quiz_title">Timed Quiz for Coins</string>
+    <string name="quiz_auth_required">GPC account authorization required</string>
+    <string name="quiz_auth_desc">Quiz rewards are distributed as GPC. Please authorize your GPC account first; after authorization you will be returned automatically and the reward will be granted.</string>
+    <string name="quiz_authorize">Authorize GPC Account</string>
+    <string name="quiz_authorizing">Waiting for GPC authorization…\nPlease sign in in the browser and tap &quot;Authorize&quot;.</string>
+    <string name="quiz_auth_retry">Reopen Authorization Page</string>
+    <string name="quiz_submit">Submit &amp; Claim Reward</string>
+    <string name="quiz_loading">Loading questions…</string>
+    <string name="quiz_retry">Retry</string>
+    <string name="quiz_reward">This question +%1$d GPC</string>
+    <string name="quiz_correct">Correct +%1$d GPC</string>
+    <string name="quiz_wrong">Wrong</string>
+    <string name="quiz_claimed">Claimed</string>
+    <string name="quiz_result_total">Total earned this round: %1$d GPC</string>
+    <string name="quiz_opt_true">True</string>
+    <string name="quiz_opt_false">False</string>
+    <string name="quiz_already_submitted">You have already submitted the quiz and cannot submit again</string>
+    <string name="quiz_completed">You have completed this round\'s quiz</string>
+    <string name="quiz_period">This round: %1$s</string>
+    <string name="quiz_draft_saved">Your answers were saved automatically; you can continue anytime</string>
+
+    <!-- Local Network Protection (Android 17 / API 37) -->
+    <string name="lan_permission_denied">This app needs access to the LAN event server (192.168.10.9:3002). Please grant the \"Local network\" permission in system settings and try again.</string>
+    <string name="lan_permission_rationale">The \"Local network\" permission is required to connect to the event server on the same Wi-Fi, used for quizzes, past questions, and update checks.</string>
+
+    <!-- What to eat wheel -->
+    <string name="food_spin">What to eat today?</string>
+    <string name="food_spin_again">Spin Again</string>
+    <string name="food_spinning">Spinning…</string>
+    <string name="food_recommend">Recommend</string>
+    <string name="food_empty_wheel">No food yet</string>
+    <string name="food_empty_hint">No dishes yet. Go to Settings → Food Management to add some.</string>
+    <string name="food_empty_toast">Please add dishes in Settings → Food Management first</string>
+    <string name="food_share">Share</string>
+    <string name="share_title">Share What to Eat Today</string>
+    <string name="share_failed">Share failed, please try again later</string>
+    <string name="food_empty_list">No dishes yet</string>
+    <string name="food_add_tab">Add Food</string>
+    <string name="food_list_tab">All Food</string>
+    <string name="food_add_title">Add Dish</string>
+    <string name="food_name_label">Dish Name</string>
+    <string name="food_weight_label">Weight</string>
+    <string name="food_weight_helper">The larger the number, the higher the chance of being picked</string>
+    <string name="food_weight_format">Weight: %1$s</string>
+    <string name="food_weight_price_format">Weight: %1$s · ¥%2$s</string>
+    <string name="food_add">Add</string>
+    <string name="food_cancel">Cancel</string>
+    <string name="food_added">Added \"%1$s\"</string>
+    <string name="food_name_empty">Please enter a dish name</string>
+    <string name="food_delete">Delete</string>
+    <string name="food_restore_default">Restore Default Menu</string>
+    <string name="food_restore_done">Default menu restored</string>
+    <string name="food_delete_confirm_title">Delete Dish</string>
+    <string name="food_delete_confirm_summary">Delete \"%1$s\"? This action cannot be undone.</string>
+
+    <!-- Food management: edit existing dishes + convert weight by price -->
+    <string name="food_edit">Edit</string>
+    <string name="food_edit_title">Edit Dish</string>
+    <string name="food_save">Save</string>
+    <string name="food_saved">Saved \"%1$s\"</string>
+    <string name="food_price_label">Price (¥)</string>
+    <string name="food_budget_label">Budget (¥)</string>
+    <string name="food_price_helper">Weight = budget ÷ price, max %1$s</string>
+    <string name="food_weight_invalid">Please enter a weight greater than 0</string>
+
+    <!-- Server status monitor (native dashboard rendered from /api/snapshot) -->
+    <string name="server_status_section">Status Monitor</string>
+    <string name="server_status_entry">Server Temperature/Performance Status</string>
+    <string name="server_status_title">Server Status</string>
+    <string name="server_status_refresh">Refresh</string>
+    <string name="server_status_open_external">Open in Browser</string>
+    <string name="server_status_loading">Loading server status…</string>
+    <string name="server_status_error">Could not load the data. Make sure the server is reachable.</string>
+    <string name="server_status_retry">Retry</string>
+    <string name="server_status_live">Live</string>
+    <string name="server_status_offline">Offline</string>
+    <string name="server_status_label_ip">Address</string>
+    <string name="server_status_label_runtime">Runtime</string>
+    <string name="server_status_empty">No monitoring data yet</string>
+
+    <!-- Monitor card groups -->
+    <string name="monitor_group_dash">Dashboard</string>
+    <string name="monitor_group_cpu">CPU</string>
+    <string name="monitor_group_gpu">GPU</string>
+    <string name="monitor_group_host">Host</string>
+    <string name="monitor_group_bat">Battery</string>
+    <string name="monitor_group_disk">Disk</string>
+    <string name="monitor_group_net">Network</string>
+    <string name="monitor_group_data">Data Usage</string>
+
+    <!-- Monitor readings -->
+    <string name="monitor_item_hostname">Hostname</string>
+    <string name="monitor_item_time">Time</string>
+    <string name="monitor_item_uptime">Uptime</string>
+    <string name="monitor_item_lan_ip">LAN IP</string>
+    <string name="monitor_item_cpu_load">CPU Usage</string>
+    <string name="monitor_item_cpu_temp">CPU Temp</string>
+    <string name="monitor_item_cpu_clock">CPU Clock</string>
+    <string name="monitor_item_cpu_power">CPU Power</string>
+    <string name="monitor_item_cpu_voltage">CPU Voltage</string>
+    <string name="monitor_item_gpu_load">GPU Usage</string>
+    <string name="monitor_item_gpu_temp">GPU Temp</string>
+    <string name="monitor_item_gpu_clock">GPU Clock</string>
+    <string name="monitor_item_gpu_vram">VRAM Used</string>
+    <string name="monitor_item_mem_load">Memory Used</string>
+    <string name="monitor_item_fps">Live FPS</string>
+    <string name="monitor_item_bat_percent">Battery Level</string>
+    <string name="monitor_item_bat_power">Battery Power</string>
+    <string name="monitor_item_bat_voltage">Battery Voltage</string>
+    <string name="monitor_item_bat_current">Battery Current</string>
+    <string name="monitor_item_disk_read">Read</string>
+    <string name="monitor_item_disk_write">Write</string>
+    <string name="monitor_item_net_up">Upload</string>
+    <string name="monitor_item_net_down">Download</string>
+    <string name="monitor_item_data_day_up">Today Up</string>
+    <string name="monitor_item_data_day_down">Today Down</string>
+
+    <!-- Weekday names used to localize the server's Chinese clock reading -->
+    <string name="monitor_weekday_mon">Mon</string>
+    <string name="monitor_weekday_tue">Tue</string>
+    <string name="monitor_weekday_wed">Wed</string>
+    <string name="monitor_weekday_thu">Thu</string>
+    <string name="monitor_weekday_fri">Fri</string>
+    <string name="monitor_weekday_sat">Sat</string>
+    <string name="monitor_weekday_sun">Sun</string>
+
+    <!-- Uptime components -->
+    <string name="monitor_uptime_day">%1$dd</string>
+    <string name="monitor_uptime_hour">%1$dh</string>
+    <string name="monitor_uptime_minute">%1$dm</string>
+    <string name="monitor_uptime_second">%1$ds</string>
+</resources>

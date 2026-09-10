@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.ui.unit.dp
 import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.icon.extended.HorizontalSplit
-import top.yukonga.miuix.kmp.icon.extended.ListView
 import top.yukonga.miuix.kmp.icon.extended.Settings
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.Scaffold
@@ -34,6 +32,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,38 +48,60 @@ import androidx.navigation3.ui.NavDisplay
 import com.chronie.gift.data.ThemeManager
 import com.chronie.gift.data.TabManager
 import com.chronie.gift.data.UpdateChecker
+import com.chronie.gift.data.LanguageManager
 import com.chronie.gift.ui.components.FloatingBottomBar
 import com.chronie.gift.ui.components.FloatingBottomBarItem
 import com.chronie.gift.ui.components.FloatingBottomBarMode
 import com.chronie.gift.data.AppDownloadManager
+import com.chronie.gift.data.ApkInstaller
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 import com.chronie.gift.ui.components.UpdateDialog
 import com.chronie.gift.ui.navigation.AnswersKey
+import com.chronie.gift.ui.navigation.FoodKey
+import com.chronie.gift.ui.navigation.FoodSettingsKey
+import com.chronie.gift.ui.permissions.rememberLocalNetworkPermissionRequester
 import com.chronie.gift.ui.navigation.HomeKey
 import com.chronie.gift.ui.navigation.LicensesKey
 import com.chronie.gift.ui.navigation.SettingsKey
+import com.chronie.gift.ui.navigation.ServerStatusKey
 import com.chronie.gift.ui.navigation.TAB_KEYS
 import com.chronie.gift.ui.navigation.TabNavKey
 import com.chronie.gift.ui.navigation.rememberGiftNavigator
 import com.chronie.gift.ui.navigation.tabKeyOf
 import com.chronie.gift.ui.screens.AnswerKeysScreen
+import com.chronie.gift.ui.screens.FoodScreen
+import com.chronie.gift.ui.screens.FoodSettingsScreen
 import com.chronie.gift.ui.screens.QuizScreen
 import com.chronie.gift.R
 import com.chronie.gift.ui.screens.LicensesScreen
 import com.chronie.gift.ui.screens.SettingsScreen
+import com.chronie.gift.ui.screens.ServerStatusScreen
 import top.yukonga.miuix.kmp.theme.ColorSchemeMode
 import top.yukonga.miuix.kmp.theme.ThemeController
 import com.chronie.gift.ui.theme.GiftTheme
+import com.chronie.gift.ui.theme.LanguageController
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import top.yukonga.miuix.kmp.icon.extended.Edit
+import top.yukonga.miuix.kmp.icon.extended.File
+import top.yukonga.miuix.kmp.icon.extended.SearchDevice
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun GiftApp() {
     val context = LocalContext.current
+
+    // Android 17 LNP: the update check hits the on-LAN event server
+    // (http://192.168.10.9:3002). Gate it behind ACCESS_LOCAL_NETWORK.
+    val scope = rememberCoroutineScope()
+    val lnpRequester = rememberLocalNetworkPermissionRequester(
+        onDenied = {
+            Toast.makeText(context, context.getString(R.string.lan_permission_denied), Toast.LENGTH_LONG).show()
+        }
+    )
 
     // Tab management
     val tabManager = remember { TabManager(context) }
@@ -107,6 +128,13 @@ fun GiftApp() {
     // the bottom bar stays in sync when the user navigates back with the system gesture.
     val selectedTab: TabNavKey by remember {
         derivedStateOf { backStack.lastOrNull { it is TabNavKey } as? TabNavKey ?: HomeKey }
+    }
+
+    // The floating nav bar (bottom on phones, top on wide screens) is only shown on the four root
+    // tabs. Secondary pages pushed on top of them (licenses, food settings, server status, ...) hide
+    // it so the in-page content gets the full screen.
+    val showNavBar by remember {
+        derivedStateOf { backStack.lastOrNull() is TabNavKey }
     }
 
     // Persist whichever tab is currently on top so the next launch restores it
@@ -138,7 +166,26 @@ fun GiftApp() {
         currentThemeMode = colorSchemeMode
         themeManager.saveTheme(newThemeMode)
     }
-    
+
+    // Language management
+    val languageManager = remember { LanguageManager(context) }
+    val savedLanguage = languageManager.getSavedLanguage()
+
+    val languageController = remember {
+        LanguageController(savedLanguage)
+    }
+
+    // Update language callback
+    val updateLanguageCode = { newLanguageCode: String? ->
+        languageController.languageCode = newLanguageCode
+        if (newLanguageCode == null) {
+            languageManager.clearLanguage()
+        } else {
+            languageManager.saveLanguage(newLanguageCode)
+        }
+        languageManager.applyLanguage(newLanguageCode)
+    }
+
     // Update check related states
     var showUpdateDialog by remember { mutableStateOf(false) }
     var latestVersion by remember { mutableStateOf("") }
@@ -162,7 +209,7 @@ fun GiftApp() {
         try {
             val updateChecker = UpdateChecker()
             val updateInfo = withContext(Dispatchers.IO) {
-                updateChecker.checkForUpdates(currentVersion)
+                updateChecker.checkForUpdates(currentVersion, languageController.languageCode)
             }
             
             if (updateInfo != null) {
@@ -191,7 +238,7 @@ fun GiftApp() {
     
     // Automatically check for updates when app starts
     LaunchedEffect(Unit) {
-        checkForUpdates()
+        lnpRequester.ensure { scope.launch { checkForUpdates() } }
     }
 
     // Switching tabs pushes the tab onto the shared back stack, exactly like the previous
@@ -205,13 +252,31 @@ fun GiftApp() {
         navigator.navigate(tab, launchSingleTop = true)
     }
 
-    // Handle update download
+    // Handle update download.
+    //
+    // Android 8.0+ refuses to install anything until the user has allowed this
+    // app to install unknown apps, so the permission is checked before the
+    // download rather than after it — otherwise the APK would be downloaded and
+    // then silently rejected. Once the download lands, AppDownloadManager hands
+    // it to the package installer automatically.
     val handleUpdate = {
         try {
-            val downloadManager = AppDownloadManager(context)
-            val downloadId = downloadManager.downloadApk(downloadUrl, latestVersion)
-            Toast.makeText(context, context.getString(R.string.update_start_download), Toast.LENGTH_SHORT).show()
-            showUpdateDialog = false
+            if (!ApkInstaller.canInstall(context)) {
+                ApkInstaller.openInstallPermissionSettings(context)
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.update_need_install_permission),
+                    Toast.LENGTH_LONG
+                ).show()
+                showUpdateDialog = false
+            } else {
+                val downloadManager = AppDownloadManager(context)
+                // The ".apk" suffix matters: without it the installer has nothing
+                // to recognise and the file is useless in the Downloads folder.
+                downloadManager.downloadApk(downloadUrl, "$latestVersion.apk")
+                Toast.makeText(context, context.getString(R.string.update_start_download), Toast.LENGTH_SHORT).show()
+                showUpdateDialog = false
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(context, context.getString(R.string.update_download_failed), Toast.LENGTH_SHORT).show()
@@ -222,7 +287,7 @@ fun GiftApp() {
     val themeController = remember(currentThemeMode) {
         ThemeController(currentThemeMode)
     }
-    GiftTheme(controller = themeController) {
+    GiftTheme(controller = themeController, languageController = languageController) {
         val backdrop = rememberLayerBackdrop()
 
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
@@ -253,8 +318,8 @@ fun GiftApp() {
                                 .using(SizeTransform(clip = false))
                             },
                             label = "bottomNavTransition",
-                        ) { wide ->
-                            if (!wide) {
+            ) { wide ->
+                if (!wide && showNavBar) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -271,7 +336,7 @@ fun GiftApp() {
                                             onTabSelected(TAB_KEYS.getOrElse(index) { HomeKey })
                                         },
                                         backdrop = backdrop,
-                                        tabsCount = 3,
+                                        tabsCount = 4,
                                         mode = navMode,
                                         autoWidth = true,
                                         isTopMode = false,
@@ -281,7 +346,7 @@ fun GiftApp() {
                                             tabIndex = 0,
                                         ) {
                                             Icon(
-                                                imageVector = MiuixIcons.HorizontalSplit,
+                                                imageVector = MiuixIcons.Edit,
                                                 contentDescription = stringResource(R.string.tab_home),
                                             )
                                             Text(
@@ -296,7 +361,7 @@ fun GiftApp() {
                                             tabIndex = 1,
                                         ) {
                                             Icon(
-                                                imageVector = MiuixIcons.ListView,
+                                                imageVector = MiuixIcons.File,
                                                 contentDescription = stringResource(R.string.tab_answers),
                                             )
                                             Text(
@@ -307,8 +372,23 @@ fun GiftApp() {
                                             )
                                         }
                                         FloatingBottomBarItem(
-                                            onClick = { onTabSelected(SettingsKey) },
+                                            onClick = { onTabSelected(FoodKey) },
                                             tabIndex = 2,
+                                        ) {
+                                            Icon(
+                                                imageVector = MiuixIcons.SearchDevice,
+                                                contentDescription = stringResource(R.string.tab_food),
+                                            )
+                                            Text(
+                                                stringResource(R.string.tab_food),
+                                                fontSize = 11.sp,
+                                                maxLines = 1,
+                                                softWrap = false,
+                                            )
+                                        }
+                                        FloatingBottomBarItem(
+                                            onClick = { onTabSelected(SettingsKey) },
+                                            tabIndex = 3,
                                         ) {
                                             Icon(
                                                 imageVector = MiuixIcons.Settings,
@@ -343,8 +423,8 @@ fun GiftApp() {
                                 .using(SizeTransform(clip = false))
                             },
                             label = "topNavTransition",
-                        ) { wide ->
-                            if (wide) {
+            ) { wide ->
+                if (wide && showNavBar) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -361,7 +441,7 @@ fun GiftApp() {
                                             onTabSelected(TAB_KEYS.getOrElse(index) { HomeKey })
                                         },
                                         backdrop = backdrop,
-                                        tabsCount = 3,
+                                        tabsCount = 4,
                                         mode = navMode,
                                         autoWidth = true,
                                         isTopMode = true,
@@ -392,8 +472,20 @@ fun GiftApp() {
                                             )
                                         }
                                         FloatingBottomBarItem(
-                                            onClick = { onTabSelected(SettingsKey) },
+                                            onClick = { onTabSelected(FoodKey) },
                                             tabIndex = 2,
+                                        ) {
+                                            Text(
+                                                stringResource(R.string.tab_food),
+                                                fontSize = 14.sp,
+                                                maxLines = 1,
+                                                softWrap = false,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                        }
+                                        FloatingBottomBarItem(
+                                            onClick = { onTabSelected(SettingsKey) },
+                                            tabIndex = 3,
                                         ) {
                                             Text(
                                                 stringResource(R.string.tab_settings),
@@ -459,23 +551,45 @@ fun GiftApp() {
                                 entry<AnswersKey> {
                                     AnswerKeysScreen()
                                 }
+                                entry<FoodKey> {
+                                    FoodScreen()
+                                }
                                 entry<SettingsKey> {
                                     SettingsScreen(
                                         onThemeUpdated = updateThemeMode,
+                                        onLanguageUpdated = updateLanguageCode,
+                                        currentLanguageCode = languageController.languageCode,
                                         onCheckUpdate = {
-                                            val coroutineScope = kotlinx.coroutines.CoroutineScope(Dispatchers.Main)
-                                            coroutineScope.launch {
-                                                checkForUpdates()
-                                            }
+                                            lnpRequester.ensure { scope.launch { checkForUpdates() } }
                                         },
                                         isCheckingUpdate = isCheckingUpdate,
                                         onNavigateToLicenses = {
                                             navigator.push(LicensesKey)
+                                        },
+                                        onNavigateToFoodSettings = {
+                                            navigator.push(FoodSettingsKey)
+                                        },
+                                        onNavigateToServerStatus = {
+                                            navigator.push(ServerStatusKey)
                                         }
                                     )
                                 }
                                 entry<LicensesKey> {
                                     LicensesScreen(
+                                        onBack = {
+                                            navigator.pop()
+                                        }
+                                    )
+                                }
+                                entry<FoodSettingsKey> {
+                                    FoodSettingsScreen(
+                                        onBack = {
+                                            navigator.pop()
+                                        }
+                                    )
+                                }
+                                entry<ServerStatusKey> {
+                                    ServerStatusScreen(
                                         onBack = {
                                             navigator.pop()
                                         }
