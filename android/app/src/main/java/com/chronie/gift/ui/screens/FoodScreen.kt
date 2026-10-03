@@ -297,7 +297,7 @@ fun FoodScreen() {
             },
         topBar = {
             SmallTopAppBar(
-                title = stringResource(id = R.string.tab_food),
+                title = stringResource(id = R.string.tab_home),
                 actions = {
                     IconButton(onClick = share) {
                         Icon(

@@ -48,42 +48,12 @@ func main() {
 	cache := NewCache(60 * time.Second)
 	handlerConfig := NewHandlerConfig(dataDir, apkDir, cache)
 
-	// GPC integration + quiz activity. Loads the connection config from
-	// server/data/gpc_config.json and lazily registers the OAuth client.
-	var gpcCfg GpcConfig
-	_ = readJSONFile(filepath.Join(dataDir, "gpc_config.json"), &gpcCfg)
-	if gpcCfg.AdminUser == "" {
-		gpcCfg.AdminUser = "admin"
-	}
-	if gpcCfg.AdminPass == "" {
-		gpcCfg.AdminPass = "admin888"
-	}
-	if gpcCfg.OAuthScope == "" {
-		gpcCfg.OAuthScope = "quiz"
-	}
-	gpcClient := newGpcClient(gpcCfg, dataDir)
-	quiz := NewQuizStore(dataDir, gpcClient, gpcCfg.OAuthScope, gpcCfg.RedirectURI)
-
-	// Best-effort bootstrap: register the GPC OAuth client now so the first
-	// client request is fast. Failures are logged but do not stop the server.
-	go func() {
-		if _, err := gpcClient.ensureOAuthClient(); err != nil {
-			log.Println("WARN: Failed to initialize GPC OAuth client (page still available, will retry on first authorization):", err)
-		} else {
-			log.Println("GPC OAuth client is ready")
-		}
-	}()
-
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/download_apk", handlerConfig.downloadApkHandler)
 	mux.HandleFunc("/api/download_apk/{filename}", handlerConfig.downloadApkFileHandler)
 	mux.HandleFunc("/api/outdate-test/markdown", handlerConfig.listMarkdownHandler)
 	mux.HandleFunc("/api/outdate-test/markdown/{filename}", handlerConfig.getMarkdownFileHandler)
-	mux.HandleFunc("/api/quiz/questions", quiz.questionsHandler)
-	mux.HandleFunc("/api/quiz/submit", quiz.submitHandler)
-	mux.HandleFunc("/api/quiz/status", quiz.statusHandler)
-	mux.HandleFunc("/api/oauth/gpc-config", quiz.gpcConfigHandler)
 
 	rootDir := filepath.Join(serverDir, "..")
 	fileServer := http.FileServer(http.Dir(rootDir))

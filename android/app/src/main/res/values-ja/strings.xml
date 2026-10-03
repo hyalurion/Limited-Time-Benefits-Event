@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">万事屋</string>
     <string name="activity">イベント</string>
-    <string name="tab_home">クイズで獲得</string>
-    <string name="tab_answers">過去の問題</string>
-    <string name="tab_food">今日のご飯</string>
+    <string name="tab_home">今日のご飯</string>
+    <string name="tab_answers">ファイル</string>
     <string name="tab_settings">設定</string>
     <string name="general_settings_title">一般設定</string>
     <string name="language_settings">言語</string>
@@ -69,31 +68,9 @@
     <string name="no_browser_found">ブラウザが見つかりません</string>
     <string name="open_link_failed">リンクを開けませんでした</string>
 
-    <!-- Quiz / activity screen -->
-    <string name="quiz_title">期間限定クイズでコイン</string>
-    <string name="quiz_auth_required">GPCアカウントの認証が必要です</string>
-    <string name="quiz_auth_desc">クイズの報酬はGPCで付与されます。最初にGPCアカウントを認証してください。認証完了後、自動的に戻り報酬が付与されます。</string>
-    <string name="quiz_authorize">GPCアカウントを認証</string>
-    <string name="quiz_authorizing">GPCの認証を待っています…\nブラウザでログインし「認証」をタップしてください</string>
-    <string name="quiz_auth_retry">認証ページを再表示</string>
-    <string name="quiz_submit">送信して報酬を受け取る</string>
-    <string name="quiz_loading">問題読み込み中…</string>
-    <string name="quiz_retry">再試行</string>
-    <string name="quiz_reward">この問題 +%1$d GPC</string>
-    <string name="quiz_correct">正解 +%1$d GPC</string>
-    <string name="quiz_wrong">不正解</string>
-    <string name="quiz_claimed">受け取り済み</string>
-    <string name="quiz_result_total">今回の獲得合計 %1$d GPC</string>
-    <string name="quiz_opt_true">正しい</string>
-    <string name="quiz_opt_false">誤り</string>
-    <string name="quiz_already_submitted">このクイズは既に送信済みで、再送信はできません</string>
-    <string name="quiz_completed">今回のクイズは完了しました</string>
-    <string name="quiz_period">今回: %1$s</string>
-    <string name="quiz_draft_saved">回答は自動保存されました。いつでも続けられます</string>
-
     <!-- Local Network Protection (Android 17 / API 37) -->
     <string name="lan_permission_denied">このアプリはLAN内のイベントサーバー（192.168.10.9:3002）へのアクセスが必要です。システム設定で「ローカルネットワーク」権限を付与して再試行してください。</string>
-    <string name="lan_permission_rationale">同じWi-Fi上のイベントサーバーへ接続するため「ローカルネットワーク」権限が必要です。クイズ、過去の問題、更新チェックに使用します。</string>
+    <string name="lan_permission_rationale">同じWi-Fi上のイベントサーバーへ接続するため「ローカルネットワーク」権限が必要です。過去の問題と更新チェックに使用します。</string>
 
     <!-- What to eat wheel -->
     <string name="food_spin">今日のご飯は？</string>

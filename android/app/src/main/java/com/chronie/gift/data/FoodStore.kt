@@ -35,8 +35,8 @@ data class FoodItem(
  *
  * Mirrors `FoodProvider` from the Flutter app, which kept a JSON file named
  * `food_data.json`. Here the list is stored as a single JSON blob in
- * SharedPreferences, the same pattern [QuizPrefs] uses, which avoids the file
- * IO and error handling the Flutter version needed.
+ * SharedPreferences, the same pattern followed here, which avoids the file IO
+ * and error handling the Flutter version needed.
  */
 object FoodPrefs {
     private const val PREFS = "food_data"

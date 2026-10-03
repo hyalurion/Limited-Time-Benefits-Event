@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">萬事屋</string>
     <string name="activity">活動</string>
-    <string name="tab_home">答題賺錢</string>
-    <string name="tab_answers">往期題目</string>
-    <string name="tab_food">今天吃什麼</string>
+    <string name="tab_home">今天吃什麼</string>
+    <string name="tab_answers">文件</string>
     <string name="tab_settings">設定</string>
     <string name="general_settings_title">通用設定</string>
     <string name="language_settings">語言</string>
@@ -68,28 +67,6 @@
     <string name="back">返回</string>
     <string name="no_browser_found">未找到瀏覽器</string>
     <string name="open_link_failed">打開連結失敗</string>
-
-    <!-- Quiz / activity screen -->
-    <string name="quiz_title">限時答題領幣</string>
-    <string name="quiz_auth_required">需要授權 GPC 帳號</string>
-    <string name="quiz_auth_desc">答題獎勵以 GPC 發放。請先授權你的 GPC 帳號，授權完成後將自動返回並發放獎勵。</string>
-    <string name="quiz_authorize">授權 GPC 帳號</string>
-    <string name="quiz_authorizing">正在等待 GPC 授權…\n請在瀏覽器中登入並點擊「授權」</string>
-    <string name="quiz_auth_retry">重新打開授權頁</string>
-    <string name="quiz_submit">提交並領取獎勵</string>
-    <string name="quiz_loading">題目載入中…</string>
-    <string name="quiz_retry">重試</string>
-    <string name="quiz_reward">本題 +%1$d GPC</string>
-    <string name="quiz_correct">答對 +%1$d GPC</string>
-    <string name="quiz_wrong">答錯</string>
-    <string name="quiz_claimed">已領取</string>
-    <string name="quiz_result_total">本次共獲得 %1$d GPC</string>
-    <string name="quiz_opt_true">正確</string>
-    <string name="quiz_opt_false">錯誤</string>
-    <string name="quiz_already_submitted">您已提交過問卷，無法重複提交</string>
-    <string name="quiz_completed">您已完成本期答題</string>
-    <string name="quiz_period">本期：%1$s</string>
-    <string name="quiz_draft_saved">您的作答已自動保存，可隨時繼續</string>
 
     <!-- Local Network Protection (Android 17 / API 37) -->
     <string name="lan_permission_denied">本應用需要存取區域網路內的活動伺服器（192.168.10.9:3002）。請在系統設定中授予「本地網路」權限後重試。</string>

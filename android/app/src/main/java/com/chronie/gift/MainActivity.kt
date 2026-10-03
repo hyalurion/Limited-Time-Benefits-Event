@@ -1,6 +1,5 @@
 package com.chronie.gift
 
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -13,8 +12,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
-import com.chronie.gift.data.GpcOAuthManager
 import com.chronie.gift.data.LanguageManager
 import com.chronie.gift.data.LocalNetworkPermission
 import com.chronie.gift.ui.GiftApp
@@ -52,12 +49,6 @@ class MainActivity : ComponentActivity() {
         }
         requestLanPermissionIfNeeded()
 
-        // Restore any previously authorized GPC token.
-        GpcOAuthManager.init(this)
-
-        // Deep link from the GPC authorize redirect (gpcgift://oauth/callback).
-        handleIntent(intent)
-
         setContent {
             GiftApp()
         }
@@ -89,29 +80,6 @@ class MainActivity : ComponentActivity() {
         if (checkSelfPermission(LocalNetworkPermission.ACCESS_LOCAL_NETWORK) == PackageManager.PERMISSION_GRANTED) return
         lanPermissionPending = true
         lanPermissionLauncher.launch(LocalNetworkPermission.ACCESS_LOCAL_NETWORK)
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        handleIntent(intent)
-    }
-
-    /**
-     * Intercepts the OAuth redirect. When GPC finishes the authorization the
-     * browser bounces to `gpcgift://oauth/callback?code=...`; we hand the code to
-     * [GpcOAuthManager] which exchanges it for an access token.
-     */
-    private fun handleIntent(intent: Intent?) {
-        val uri: Uri = intent?.data ?: return
-        if (uri.scheme == "gpcgift") {
-            val code = uri.getQueryParameter("code")
-            if (!code.isNullOrEmpty()) {
-                lifecycleScope.launch {
-                    GpcOAuthManager.handleCallback(code)
-                }
-            }
-        }
     }
 }
 

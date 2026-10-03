@@ -8,12 +8,12 @@ import kotlinx.serialization.Serializable
  *
  * These values are persisted by [com.chronie.gift.data.TabManager] into SharedPreferences and are
  * intentionally kept identical to the route strings used before the Navigation 3 migration, so an
- * app that is updated in place still restores the tab the user left off on.
+ * app that is updated in place still restores the tab the user left off on. Unchanged ids keep
+ * resolving even after a tab is gone, see [tabKeyOf].
  */
 object TabIds {
     const val HOME = "home"
     const val ANSWERS = "answers"
-    const val FOOD = "food"
     const val SETTINGS = "settings"
 }
 
@@ -48,12 +48,6 @@ data object AnswersKey : TabNavKey {
     override val tabId: String get() = TabIds.ANSWERS
 }
 
-/** The "What to eat" wheel, third of the four tabs. */
-@Serializable
-data object FoodKey : TabNavKey {
-    override val tabId: String get() = TabIds.FOOD
-}
-
 @Serializable
 data object SettingsKey : TabNavKey {
     override val tabId: String get() = TabIds.SETTINGS
@@ -71,8 +65,15 @@ data object FoodSettingsKey : GiftNavKey
 @Serializable
 data object ServerStatusKey : GiftNavKey
 
-/** Tabs in the order they are rendered by the floating bottom bar. */
-val TAB_KEYS: List<TabNavKey> = listOf(HomeKey, AnswersKey, FoodKey, SettingsKey)
+/**
+ * Tabs in the order they are rendered by the floating bottom bar.
+ *
+ * The "What to eat" wheel is the home tab, so the list only holds three entries.
+ * A tab id that is no longer present (for instance the "food" tab of a build that
+ * predates this layout) resolves to [HomeKey] through [tabKeyOf], which means an
+ * in-place update lands on the wheel instead of an empty screen.
+ */
+val TAB_KEYS: List<TabNavKey> = listOf(HomeKey, AnswersKey, SettingsKey)
 
 /** Maps a persisted [TabIds] value back to its key, falling back to [HomeKey]. */
 fun tabKeyOf(tabId: String?): TabNavKey = TAB_KEYS.firstOrNull { it.tabId == tabId } ?: HomeKey

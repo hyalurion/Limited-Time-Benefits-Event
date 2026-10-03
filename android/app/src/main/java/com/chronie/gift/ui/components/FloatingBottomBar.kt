@@ -1,6 +1,7 @@
 package com.chronie.gift.ui.components
 
 import android.os.Build
+import com.chronie.gift.BuildConfig
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.spring
@@ -60,6 +61,7 @@ import com.chronie.gift.ui.theme.liquid.InteractiveHighlight
 import com.chronie.gift.ui.theme.liquid.InnerShadow
 import com.chronie.gift.ui.theme.liquid.lens
 import com.chronie.gift.ui.theme.liquid.rememberCombinedBackdrop
+import androidx.compose.ui.unit.Dp
 import com.chronie.gift.ui.theme.liquid.vibrancy
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
@@ -90,6 +92,12 @@ val LocalFloatingBottomBarTabScale = staticCompositionLocalOf { { 1f } }
 // Composition locals for auto-width tab measurement
 val LocalFloatingBottomBarOnTabMeasured = staticCompositionLocalOf<((Int, Float) -> Unit)?> { null }
 val LocalFloatingBottomBarAutoWidth = staticCompositionLocalOf { false }
+
+// Number of tabs the owning bar renders. Items report their measured width
+// under this index, so an out-of-range index silently drops the measurement
+// and pushes the indicator back onto its hardcoded fallback geometry. Every
+// item therefore asserts its index against this value.
+val LocalFloatingBottomBarTabsCount = staticCompositionLocalOf { Int.MAX_VALUE }
 
 @Immutable
 class FloatingBottomBarColors(
@@ -191,6 +199,14 @@ fun RowScope.FloatingBottomBarItem(
     val contentColor = LocalFloatingBottomBarContentColor.current
     val autoWidth = LocalFloatingBottomBarAutoWidth.current
     val onTabMeasured = LocalFloatingBottomBarOnTabMeasured.current
+    val tabsCount = LocalFloatingBottomBarTabsCount.current
+
+    if (BuildConfig.DEBUG && tabIndex >= tabsCount) {
+        throw IllegalArgumentException(
+            "FloatingBottomBarItem tabIndex=$tabIndex is out of range for a bar with $tabsCount tabs " +
+                "(valid range 0..${tabsCount - 1})."
+        )
+    }
 
 // Each item wraps its content width but fills the Row's height so that the
     // CircleShape clip doesn't shave off the bottom of the text. A minimum
@@ -211,7 +227,7 @@ fun RowScope.FloatingBottomBarItem(
             onClick = onClick
         )
         .then(
-            if (autoWidth && tabIndex >= 0 && onTabMeasured != null) {
+            if (autoWidth && tabIndex >= 0 && tabIndex < tabsCount && onTabMeasured != null) {
                 Modifier.onGloballyPositioned { coords ->
                     onTabMeasured(tabIndex, coords.size.width.toFloat())
                 }
@@ -246,6 +262,9 @@ fun FloatingBottomBar(
     colors: FloatingBottomBarColors = FloatingBottomBarDefaults.colors(),
     autoWidth: Boolean = true,
     isTopMode: Boolean = false,
+    // Horizontal gap between tabs. The indicator derives its geometry from the
+    // same spacing, so a smaller gap also tightens the bar on narrow screens.
+    contentGap: Dp = 20.dp,
     content: @Composable RowScope.() -> Unit
 ) {
     val isInDark = MiuixTheme.colorSchemeMode == ColorSchemeMode.Dark
@@ -292,7 +311,9 @@ fun FloatingBottomBar(
 
     // Tab centers and widths derived from measured widths + fixed gap.
     // Using spacedBy ensures the gap is always exactly `fixedGapPx`.
-    val fixedGapPx = with(density) { 20.dp.toPx() }
+    // Must stay in sync with the Row's Arrangement.spacedBy(contentGap),
+    // otherwise the indicator's centers drift away from the real tab positions.
+    val fixedGapPx = with(density) { contentGap.toPx() }
 
     val allMeasured by remember {
         derivedStateOf {
@@ -516,6 +537,7 @@ fun FloatingBottomBar(
             LocalFloatingBottomBarContentColor provides colors.contentColor,
             LocalFloatingBottomBarAutoWidth provides autoWidth,
             LocalFloatingBottomBarOnTabMeasured provides onTabMeasured,
+            LocalFloatingBottomBarTabsCount provides tabsCount,
         ) {
             Row(
                 Modifier
@@ -588,7 +610,7 @@ fun FloatingBottomBar(
                     .height(barHeight)
                     .padding(horizontal = rowHorizontalPadding),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalArrangement = Arrangement.spacedBy(contentGap),
                 content = content
             )
         }
@@ -602,6 +624,7 @@ fun FloatingBottomBar(
                 LocalFloatingBottomBarContentColor provides colors.activeContentColor,
                 LocalFloatingBottomBarAutoWidth provides autoWidth,
                 LocalFloatingBottomBarOnTabMeasured provides null,
+                LocalFloatingBottomBarTabsCount provides tabsCount,
             ) {
                 Row(
                     Modifier
@@ -626,7 +649,7 @@ fun FloatingBottomBar(
                         .height(innerBarHeight)
                         .padding(horizontal = rowHorizontalPadding),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(contentGap),
                 ) {
                     content()
                 }

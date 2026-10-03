@@ -1,6 +1,5 @@
 package com.chronie.gift.data
 
-import com.chronie.gift.ui.screens.ApiClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers

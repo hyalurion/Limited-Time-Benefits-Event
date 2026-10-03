@@ -58,7 +58,6 @@ import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 import com.chronie.gift.ui.components.UpdateDialog
 import com.chronie.gift.ui.navigation.AnswersKey
-import com.chronie.gift.ui.navigation.FoodKey
 import com.chronie.gift.ui.navigation.FoodSettingsKey
 import com.chronie.gift.ui.permissions.rememberLocalNetworkPermissionRequester
 import com.chronie.gift.ui.navigation.HomeKey
@@ -72,7 +71,6 @@ import com.chronie.gift.ui.navigation.tabKeyOf
 import com.chronie.gift.ui.screens.AnswerKeysScreen
 import com.chronie.gift.ui.screens.FoodScreen
 import com.chronie.gift.ui.screens.FoodSettingsScreen
-import com.chronie.gift.ui.screens.QuizScreen
 import com.chronie.gift.R
 import com.chronie.gift.ui.screens.LicensesScreen
 import com.chronie.gift.ui.screens.SettingsScreen
@@ -85,7 +83,6 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.icon.extended.Edit
 import top.yukonga.miuix.kmp.icon.extended.File
 import top.yukonga.miuix.kmp.icon.extended.SearchDevice
 
@@ -336,17 +333,18 @@ fun GiftApp() {
                                             onTabSelected(TAB_KEYS.getOrElse(index) { HomeKey })
                                         },
                                         backdrop = backdrop,
-                                        tabsCount = 4,
+                                        tabsCount = 3,
                                         mode = navMode,
                                         autoWidth = true,
                                         isTopMode = false,
+                                        contentGap = 12.dp,
                                     ) {
                                         FloatingBottomBarItem(
                                             onClick = { onTabSelected(HomeKey) },
                                             tabIndex = 0,
                                         ) {
                                             Icon(
-                                                imageVector = MiuixIcons.Edit,
+                                                imageVector = MiuixIcons.SearchDevice,
                                                 contentDescription = stringResource(R.string.tab_home),
                                             )
                                             Text(
@@ -354,6 +352,7 @@ fun GiftApp() {
                                                 fontSize = 11.sp,
                                                 maxLines = 1,
                                                 softWrap = false,
+                                                overflow = TextOverflow.Ellipsis,
                                             )
                                         }
                                         FloatingBottomBarItem(
@@ -372,23 +371,8 @@ fun GiftApp() {
                                             )
                                         }
                                         FloatingBottomBarItem(
-                                            onClick = { onTabSelected(FoodKey) },
-                                            tabIndex = 2,
-                                        ) {
-                                            Icon(
-                                                imageVector = MiuixIcons.SearchDevice,
-                                                contentDescription = stringResource(R.string.tab_food),
-                                            )
-                                            Text(
-                                                stringResource(R.string.tab_food),
-                                                fontSize = 11.sp,
-                                                maxLines = 1,
-                                                softWrap = false,
-                                            )
-                                        }
-                                        FloatingBottomBarItem(
                                             onClick = { onTabSelected(SettingsKey) },
-                                            tabIndex = 3,
+                                            tabIndex = 2,
                                         ) {
                                             Icon(
                                                 imageVector = MiuixIcons.Settings,
@@ -441,7 +425,7 @@ fun GiftApp() {
                                             onTabSelected(TAB_KEYS.getOrElse(index) { HomeKey })
                                         },
                                         backdrop = backdrop,
-                                        tabsCount = 4,
+                                        tabsCount = 3,
                                         mode = navMode,
                                         autoWidth = true,
                                         isTopMode = true,
@@ -472,20 +456,8 @@ fun GiftApp() {
                                             )
                                         }
                                         FloatingBottomBarItem(
-                                            onClick = { onTabSelected(FoodKey) },
-                                            tabIndex = 2,
-                                        ) {
-                                            Text(
-                                                stringResource(R.string.tab_food),
-                                                fontSize = 14.sp,
-                                                maxLines = 1,
-                                                softWrap = false,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
-                                        }
-                                        FloatingBottomBarItem(
                                             onClick = { onTabSelected(SettingsKey) },
-                                            tabIndex = 3,
+                                            tabIndex = 2,
                                         ) {
                                             Text(
                                                 stringResource(R.string.tab_settings),
@@ -546,13 +518,11 @@ fun GiftApp() {
                             },
                             entryProvider = entryProvider {
                                 entry<HomeKey> {
-                                    QuizScreen()
+                                    // The home tab is the "What to eat" wheel.
+                                    FoodScreen()
                                 }
                                 entry<AnswersKey> {
                                     AnswerKeysScreen()
-                                }
-                                entry<FoodKey> {
-                                    FoodScreen()
                                 }
                                 entry<SettingsKey> {
                                     SettingsScreen(
